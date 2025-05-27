@@ -1,6 +1,6 @@
 import '@src/Panel.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import { persistEventStorage, themeStorage } from '@extension/storage';
+// import { persistEventStorage, themeStorage } from '@extension/storage';
 import { use, useEffect, useState, type ComponentPropsWithoutRef } from 'react';
 import { t } from '@extension/i18n';
 import CryptoJS from 'crypto-js';
@@ -10,6 +10,7 @@ import { cn } from './util/tailwind';
 import { Input } from './components/Input';
 import { Check, Settings } from 'lucide-react';
 import { Checkbox } from './components/Checkbox';
+import { useChromeStorage } from './hooks/useChromeStorage';
 
 const DUMMY_DATA = [
   {
@@ -40,6 +41,7 @@ const DUMMY_DATA = [
       token: '52e5e0805583e8a410f1ed50d8e0c049',
       mp_sent_by_lib_version: '2.51.0',
     },
+    time: '5/26/2025, 10:03:28 AM',
   },
   {
     event: 'view_experiment',
@@ -70,6 +72,7 @@ const DUMMY_DATA = [
       token: '52e5e0805583e8a410f1ed50d8e0c049',
       mp_sent_by_lib_version: '2.51.0',
     },
+    time: '5/26/2025, 10:03:28 AM',
   },
   {
     event: 'view_scribe',
@@ -105,6 +108,7 @@ const DUMMY_DATA = [
       token: '52e5e0805583e8a410f1ed50d8e0c049',
       mp_sent_by_lib_version: '2.51.0',
     },
+    time: '5/26/2025, 10:03:28 AM',
   },
   {
     event: '$identify',
@@ -129,6 +133,7 @@ const DUMMY_DATA = [
       token: '52e5e0805583e8a410f1ed50d8e0c049',
       mp_sent_by_lib_version: '2.51.0',
     },
+    time: '5/26/2025, 10:03:28 AM',
   },
   {
     event: 'view_experiment',
@@ -160,6 +165,7 @@ const DUMMY_DATA = [
       token: '52e5e0805583e8a410f1ed50d8e0c049',
       mp_sent_by_lib_version: '2.51.0',
     },
+    time: '5/26/2025, 10:03:28 AM',
   },
   {
     event: 'view_experiment',
@@ -191,6 +197,7 @@ const DUMMY_DATA = [
       token: '52e5e0805583e8a410f1ed50d8e0c049',
       mp_sent_by_lib_version: '2.51.0',
     },
+    time: '5/26/2025, 10:03:28 AM',
   },
   {
     event: 'view_experiment',
@@ -222,6 +229,7 @@ const DUMMY_DATA = [
       token: '52e5e0805583e8a410f1ed50d8e0c049',
       mp_sent_by_lib_version: '2.51.0',
     },
+    time: '5/26/2025, 10:03:28 AM',
   },
   {
     event: 'view_experiment',
@@ -253,6 +261,7 @@ const DUMMY_DATA = [
       token: '52e5e0805583e8a410f1ed50d8e0c049',
       mp_sent_by_lib_version: '2.51.0',
     },
+    time: '5/26/2025, 10:03:28 AM',
   },
   {
     event: 'view_experiment',
@@ -284,16 +293,21 @@ const DUMMY_DATA = [
       token: '52e5e0805583e8a410f1ed50d8e0c049',
       mp_sent_by_lib_version: '2.51.0',
     },
+    time: '5/26/2025, 10:03:28 AM',
   },
 ];
 
+const MIXPANEL_DOMAIN = 'api.mixpanel.com';
+
 const Panel = () => {
-  const [eventList, setEventList] = useState<EventList>([]);
-  const theme = useStorage(themeStorage);
-  const persistEvents = useStorage(persistEventStorage);
+  const [tempEventList, setTempEventList] = useState<EventList>([]);
   // const [eventsPersisted, setEventsPersisted] = useState(false);
   // console.log('*** persistEvents', persistEvents);
+  const { storageData, setCustomDomain, setPersistEvents, setEventList, setTheme } = useChromeStorage();
+  console.log('*** storageData', storageData);
+  const theme = storageData.theme || 'light';
   const isLight = theme === 'light';
+  console.log('*** isLight', isLight);
   // const logo = isLight ? 'devtools-panel/logo_horizontal.svg' : 'devtools-panel/logo_horizontal_dark.svg';
   // const goGithubSite = () =>
   //   chrome.tabs.create({ url: 'https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite' });
@@ -341,44 +355,100 @@ const Panel = () => {
           return;
         }
 
-        setEventList(parsedArray);
+        const now = new Date();
+        const dateTimeString = now.toLocaleTimeString();
 
+        // add timest to each event
+        parsedArray = parsedArray
+          .filter(event => event.event)
+          .map(event => ({
+            ...event,
+            time: dateTimeString,
+          }));
+
+        if (storageData.persistEvents) {
+          // If persistEvents is true, save the events to storage
+          console.log('*** Persisting events to storage');
+          const newEventList = [...storageData.eventList, ...parsedArray.map(event => JSON.stringify(event))];
+          console.log('*** New Event List:', newEventList);
+          setEventList(newEventList);
+          setTempEventList(newEventList.map(event => JSON.parse(event)));
+          // console.log('*** New Event List:', newEventList);
+        } else {
+          setTempEventList(parsedArray);
+        }
         // Example: Log each item in the array
-        parsedArray.forEach((item, index) => {
-          console.log(`*** Item ${index + 1}:`, item);
-        });
+        // parsedArray.forEach((item, index) => {
+        //   console.log(`*** Item ${index + 1}:`, item);
+        // });
       } catch (error) {
         console.error('*** Error processing request:', error);
       }
     }
   });
 
+  const handleClearEvents = () => {
+    console.log('*** Clear Events');
+    setTempEventList([]);
+    setEventList([]); // Clear the event list in storage
+  };
+
+  useEffect(() => {
+    // Load persisted events from storage when the component mounts
+    if (storageData.persistEvents) {
+      console.log('*** Loading persisted events from storage');
+      const persistedEvents = storageData.eventList.map(event => JSON.parse(event));
+      setTempEventList(persistedEvents);
+    }
+  }, [storageData.persistEvents, storageData.eventList]);
+
+  useEffect(() => {
+    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = e => setTheme(e.matches === true ? 'dark' : 'light');
+    console.log('*** darkModeQuery', darkModeQuery);
+
+    // Set the initial value
+    // setIsDarkMode(darkModeQuery.matches);
+
+    // Listen for changes
+    darkModeQuery.addEventListener('change', handleChange);
+
+    // Clean up the listener on unmount
+    return () => darkModeQuery.removeEventListener('change', handleChange);
+  }, []);
+
   return (
     // `App ${isLight ? 'bg-slate-50 text-gray-900' : 'bg-gray-800 text-gray-100'}`
     <div
       className={cn('App flex flex-col', {
         'bg-slate-50 text-gray-900': isLight,
-        'bg-gray-800 text-gray-100': !isLight,
+        'bg-slate-800 text-gray-100': !isLight,
       })}>
-      <header className="w-full bg-white px-4 shadow py-2">
+      <header
+        className={cn('w-full px-4 shadow py-2', {
+          'bg-white': isLight,
+          'bg-slate-900': !isLight,
+        })}>
         <div className="flex gap-2 items-center py-2">
           <div className="flex items-center gap-1.5 flex-1">
             <label htmlFor="custom-url" className="flex-none">
               Custom URL:
             </label>
-            <Input className="w-full" name="custom-url" id="custom-url" />
+            <Input
+              className="w-full"
+              name="custom-url"
+              id="custom-url"
+              value={storageData.customDomain}
+              onChange={e => setCustomDomain(e.target.value)}
+            />
           </div>
-          <button className="flex-none" onClick={() => console.log('*** test')}>
-            <Settings className="text-slate-600" />
-            <span className="sr-only">settings</span>
-          </button>
         </div>
         <div className="flex items-center justify-between py-2">
           <div className="flex items-center gap-1.5">
-            <Checkbox checked={persistEvents} onCheckedChange={() => persistEventStorage.toggle()} />
+            <Checkbox checked={storageData.persistEvents} onCheckedChange={value => setPersistEvents(value === true)} />
             <label htmlFor="persist-events">Persist Events</label>
           </div>
-          <button>Clear Events</button>
+          <button onClick={handleClearEvents}>Clear Events</button>
         </div>
       </header>
       {/* <header className={`App-header ${isLight ? 'text-gray-900' : 'text-gray-100'}`}> */}
@@ -388,17 +458,34 @@ const Panel = () => {
       {/* <p>
           Edit <code>pages/devtools-panel/src/Panel.tsx</code>
         </p> */}
-      <ul className="my-10 h-full overflow-y-auto w-full">
-        {eventList.map((event, index) => (
-          <li key={event?.event + '-' + index} className="w-full">
-            <div className="border border-slate-400 shadow p-2 rounded my-2 text-left text-sm w-full">
-              <div id="card-header" className="text-base font-semibold">
+      <ul className="my-4 h-full overflow-y-auto w-full">
+        {/* {DUMMY_DATA.map((event, index) => ( */}
+        {tempEventList.map((event, index) => (
+          <li key={event?.event + '-' + index} className="w-full px-4">
+            <div className="border border-slate-400 shadow p-2 rounded my-2 text-left text-sm w-full max-w-full overflow-x-scroll">
+              {/* <div id="card-header" className="text-base font-semibold">
                 {event.event}
-              </div>
-              {event.properties?.experiment && <div>{event.properties.experiment}</div>}
+              </div> */}
               <Accordion type="single" collapsible>
                 <AccordionItem value="item-1">
-                  <AccordionTrigger>Properties</AccordionTrigger>
+                  {/* ${event.properties?.experiment ? ': ' + event.properties?.experiment : ''} */}
+                  <AccordionTrigger>
+                    <div className="flex flex-col w-full min-w-0">
+                      <div className="flex w-full justify-between text-xs">
+                        <span className="truncate min-w-0 font-semibold">{`${event.event}`}</span>
+                        <span className="flex-none">{event?.time}</span>
+                      </div>
+                    </div>
+                  </AccordionTrigger>
+                  {event.properties?.experiment && (
+                    <div
+                      className={cn('text-sm truncate max-w-full min-w-0 pl-4', {
+                        'text-slate-600': isLight,
+                        'text-slate-300': !isLight,
+                      })}>
+                      {event.properties?.experiment}
+                    </div>
+                  )}
                   <AccordionContent>
                     <ul>
                       {/* {console.log()} */}
@@ -423,26 +510,26 @@ const Panel = () => {
           </li>
         ))}
       </ul>
-      <ToggleButton onClick={themeStorage.toggle}>{t('toggleTheme')}</ToggleButton>
+      {/* <ToggleButton onClick={themeStorage.toggle}>{t('toggleTheme')}</ToggleButton> */}
       {/* </header> */}
     </div>
   );
 };
 
-const ToggleButton = (props: ComponentPropsWithoutRef<'button'>) => {
-  const theme = useStorage(themeStorage);
-  return (
-    <button
-      className={
-        props.className +
-        ' ' +
-        'font-bold mt-4 py-1 px-4 rounded shadow hover:scale-105 ' +
-        (theme === 'light' ? 'bg-white text-black' : 'bg-black text-white')
-      }
-      onClick={themeStorage.toggle}>
-      {props.children}
-    </button>
-  );
-};
+// const ToggleButton = (props: ComponentPropsWithoutRef<'button'>) => {
+//   const theme = useStorage(themeStorage);
+//   return (
+//     <button
+//       className={
+//         props.className +
+//         ' ' +
+//         'font-bold mt-4 py-1 px-4 rounded shadow hover:scale-105 ' +
+//         (theme === 'light' ? 'bg-white text-black' : 'bg-black text-white')
+//       }
+//       onClick={themeStorage.toggle}>
+//       {props.children}
+//     </button>
+//   );
+// };
 
 export default withErrorBoundary(withSuspense(Panel, <div> Loading ... </div>), <div> Error Occur </div>);

@@ -37,6 +37,7 @@ export type Properties = {
 export type Event = {
   event: string;
   properties: Properties;
+  time: string;
 };
 
 export type EventList = Event[];
