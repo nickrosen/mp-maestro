@@ -21,8 +21,6 @@ const Panel = () => {
   chrome.devtools.network.onRequestFinished.addListener(function (request) {
     // 'usage.scribehow.com'
     if (request.request.url.includes(storageData.customDomain || MIXPANEL_DOMAIN)) {
-      console.log('*** init');
-
       try {
         // Ensure postData exists
         if (!request.request.postData || !request.request.postData.text) {
