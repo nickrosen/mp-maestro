@@ -313,7 +313,8 @@ const Panel = () => {
   //   chrome.tabs.create({ url: 'https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite' });
 
   chrome.devtools.network.onRequestFinished.addListener(function (request) {
-    if (request.request.url.includes('usage.scribehow.com')) {
+    // 'usage.scribehow.com'
+    if (request.request.url.includes(storageData.customDomain || MIXPANEL_DOMAIN)) {
       console.log('*** init');
 
       try {
