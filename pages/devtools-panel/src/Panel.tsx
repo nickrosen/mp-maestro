@@ -155,7 +155,7 @@ const Panel = () => {
         {/* {DUMMY_DATA.map((event, index) => ( */}
         {tempEventList.map((event, index) => (
           <li key={event?.event + '-' + index} className="w-full px-4">
-            <div className="border border-slate-400 shadow p-2 rounded my-2 text-left text-sm w-full max-w-full overflow-x-scroll">
+            <div className="border border-slate-400 shadow p-2 rounded my-2 text-left text-sm w-full max-w-full overflow-x-scroll overflow-hidden">
               <Accordion type="single" collapsible>
                 <AccordionItem value="item-1">
                   <AccordionTrigger>
@@ -168,7 +168,7 @@ const Panel = () => {
                   </AccordionTrigger>
                   {event.properties?.experiment && (
                     <div
-                      className={cn('text-sm truncate max-w-full min-w-0 pl-4', {
+                      className={cn('text-sm truncate max-w-full min-w-0 pl-5', {
                         'text-slate-600': isLight,
                         'text-slate-300': !isLight,
                       })}>

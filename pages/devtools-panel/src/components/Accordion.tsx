@@ -23,7 +23,30 @@ const AccordionTrigger = React.forwardRef<
         className,
       )}
       {...props}>
-      <ChevronDown className="h-4 w-4 top-px relative shrink-0 text-muted-foreground transition-transform duration-200" />
+      {/* <ChevronDown className="h-4 w-4 top-px relative shrink-0 text-muted-foreground transition-transform duration-200" /> */}
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-4 w-4 top-px relative shrink-0 stroke-slate-600 transition-transform duration-200 mr-1">
+        <path
+          d="M18.0699 14.43L11.9999 20.5L5.92993 14.43"
+          stroke-width="1.5"
+          stroke-miterlimit="10"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M12 3.5V20.33"
+          stroke-width="1.5"
+          stroke-miterlimit="10"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+
       {children}
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
