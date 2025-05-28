@@ -74,13 +74,13 @@ const Panel = () => {
         if (storageData.persistEvents) {
           // If persistEvents is true, save the events to storage
           console.log('*** Persisting events to storage');
-          const newEventList = [...storageData.eventList, ...parsedArray.map(event => JSON.stringify(event))];
+          const newEventList = [...storageData.eventList, ...parsedArray.map(event => JSON.stringify(event))].reverse();
           console.log('*** New Event List:', newEventList);
           setEventList(newEventList);
           setTempEventList(newEventList.map(event => JSON.parse(event)));
           // console.log('*** New Event List:', newEventList);
         } else {
-          setTempEventList(parsedArray);
+          setTempEventList(parsedArray.reverse());
         }
         // Example: Log each item in the array
         // parsedArray.forEach((item, index) => {
@@ -103,7 +103,7 @@ const Panel = () => {
     if (storageData.persistEvents) {
       console.log('*** Loading persisted events from storage');
       const persistedEvents = storageData.eventList.map(event => JSON.parse(event));
-      setTempEventList(persistedEvents);
+      setTempEventList(persistedEvents.reverse());
     }
   }, [storageData.persistEvents, storageData.eventList]);
 
@@ -155,7 +155,7 @@ const Panel = () => {
         {/* {DUMMY_DATA.map((event, index) => ( */}
         {tempEventList.map((event, index) => (
           <li key={event?.event + '-' + index} className="w-full px-4">
-            <div className="border border-slate-400 shadow p-2 rounded my-2 text-left text-sm w-full max-w-full overflow-x-scroll overflow-hidden">
+            <div className="border border-slate-400 shadow p-2 rounded my-2 text-left text-sm w-full max-w-full overflow-hidden">
               <Accordion type="single" collapsible>
                 <AccordionItem value="item-1">
                   <AccordionTrigger>

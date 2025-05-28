@@ -1,7 +1,7 @@
 {
-  "name": "chrome-extension",
-  "version": "0.4.2",
-  "description": "chrome extension - core settings",
+  "name": "Mixpanel Event List",
+  "version": "0.1.0",
+  "description": "View Mixpanel events in devtools.",
   "type": "module",
   "private": true,
   "sideEffects": false,
