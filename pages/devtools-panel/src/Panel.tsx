@@ -74,13 +74,13 @@ const Panel = () => {
         if (storageData.persistEvents) {
           // If persistEvents is true, save the events to storage
           console.log('*** Persisting events to storage');
-          const newEventList = [...storageData.eventList, ...parsedArray.map(event => JSON.stringify(event))].reverse();
+          const newEventList = [...storageData.eventList, ...parsedArray.map(event => JSON.stringify(event))];
           console.log('*** New Event List:', newEventList);
           setEventList(newEventList);
           setTempEventList(newEventList.map(event => JSON.parse(event)));
           // console.log('*** New Event List:', newEventList);
         } else {
-          setTempEventList(parsedArray.reverse());
+          setTempEventList(parsedArray);
         }
         // Example: Log each item in the array
         // parsedArray.forEach((item, index) => {
@@ -103,7 +103,7 @@ const Panel = () => {
     if (storageData.persistEvents) {
       console.log('*** Loading persisted events from storage');
       const persistedEvents = storageData.eventList.map(event => JSON.parse(event));
-      setTempEventList(persistedEvents.reverse());
+      setTempEventList(persistedEvents);
     }
   }, [storageData.persistEvents, storageData.eventList]);
 
@@ -153,7 +153,7 @@ const Panel = () => {
       </header>
       <ul className="my-4 h-full overflow-y-auto w-full">
         {/* {DUMMY_DATA.map((event, index) => ( */}
-        {tempEventList.map((event, index) => (
+        {tempEventList.reverse().map((event, index) => (
           <li key={event?.event + '-' + index} className="w-full px-4">
             <div className="border border-slate-400 shadow p-2 rounded my-2 text-left text-sm w-full max-w-full overflow-hidden">
               <Accordion type="single" collapsible>
