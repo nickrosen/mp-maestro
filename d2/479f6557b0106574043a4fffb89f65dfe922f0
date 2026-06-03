@@ -1,0 +1,19 @@
+.husky/pre-commit
+  s_09a3ea84631636::t_1e9a1a8517b491 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d2479f6557b0106574043a4fffb89f65dfe922f0",
+  "prompts": {},
+  "sessions": {
+    "s_09a3ea84631636": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48409ea5-7584-4ff7-841c-b7e103d4dde7",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Nick Rosen <rosennm@gmail.com>"
+    }
+  }
+}
