@@ -1,0 +1,22 @@
+pages/devtools-panel/src/Panel.tsx
+  s_09a3ea84631636::t_38822d9fdceef2 101-107
+  s_09a3ea84631636::t_0d89e3fe072ac4 159
+  s_09a3ea84631636::t_51447e8be3a7b6 158,161-162
+  s_09a3ea84631636::t_05ea21db13baa3 160
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "52c8b4a7bec11e498bc8d5736c065858f109b3e9",
+  "prompts": {},
+  "sessions": {
+    "s_09a3ea84631636": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48409ea5-7584-4ff7-841c-b7e103d4dde7",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Nick Rosen <rosennm@gmail.com>"
+    }
+  }
+}
