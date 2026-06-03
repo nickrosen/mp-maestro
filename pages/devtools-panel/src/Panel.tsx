@@ -98,6 +98,13 @@ const Panel = () => {
     setEventList([]); // Clear the event list in storage
   };
 
+  const handleCopyAllEvents = () => {
+    console.log('*** Copy All Events as JSON');
+    navigator.clipboard
+      .writeText(JSON.stringify(tempEventList, null, 2))
+      .catch(error => console.error('*** Error copying events:', error));
+  };
+
   useEffect(() => {
     // Load persisted events from storage when the component mounts
     if (storageData.persistEvents) {
@@ -148,7 +155,11 @@ const Panel = () => {
             <Checkbox checked={storageData.persistEvents} onCheckedChange={value => setPersistEvents(value === true)} />
             <label htmlFor="persist-events">Persist Events</label>
           </div>
-          <button onClick={handleClearEvents}>Clear Events</button>
+          <div className="flex items-center gap-2">
+            <button onClick={handleCopyAllEvents}>Copy as JSON</button>
+            <span className="opacity-40">|</span>
+            <button onClick={handleClearEvents}>Clear Events</button>
+          </div>
         </div>
       </header>
       <ul className="my-4 h-full overflow-y-auto w-full">
